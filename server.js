@@ -1,54 +1,42 @@
 import express from "express";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import pg from "pg";
-
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// PostgreSQL configuration
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
 });
 
-// Express middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Routes
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Your engine check light has come on.");
 });
 
-const daysOfTheWeek = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-];
-daysOfTheWeek.forEach((day) => {
-  pool.query(
-    `
-    CREATE TABLE IF NOT EXISTS ${day} (
-      id SERIAL PRIMARY KEY,
-      task VARCHAR(255) NOT NULL
-    )
-  `,
-    (err, res) => {
-      if (err) {
-        console.log(`Error creating ${day} table: ${err}`);
-      } else {
-        console.log(`Created ${day} table`);
-      }
+// basic error and route
+app.get("/tasks", (req, res) => {
+  res.status(400).send("Specify a day.");
+});
+
+// tasks for day
+app.get("/tasks/:day", (req, res) => {
+  const day = req.params.day;
+  pool.query(`SELECT * FROM ${day}`, (err, result) => {
+    if (err) {
+      console.log(`Error getting tasks from ${day} table: ${err}`);
+      res.status(500).send("Error getting tasks");
+    } else {
+      console.log(`Got tasks from ${day} table`);
+      res.status(200).send(result.rows);
     }
-  );
+  });
 });
 
-// add a new task to the database
+// new task finish parse
 app.post("/tasks", (req, res) => {
   const { day, task } = req.body;
 
@@ -63,23 +51,22 @@ app.post("/tasks", (req, res) => {
   });
 });
 
-// get all tasks for a particular day
-app.get("/tasks/:day", (req, res) => {
-  const day = req.params.day;
+// delete a task from the database
+app.delete("/tasks/:day/:id", (req, res) => {
+  const { day, id } = req.params;
 
-  pool.query(`SELECT * FROM ${day}`, (err, result) => {
+  pool.query(`DELETE FROM ${day} WHERE id = $1`, [id], (err, result) => {
     if (err) {
-      console.log(`Error getting tasks from ${day} table: ${err}`);
-      res.status(500).send("Error getting tasks");
+      console.log(`Error deleting task from ${day} table: ${err}`);
+      res.status(500).send("Error deleting task");
     } else {
-      console.log(`Got tasks from ${day} table`);
-      res.status(200).send(result.rows);
+      console.log(`Deleted task from ${day} table: ${id}`);
+      res.status(200).send("Task deleted successfully");
     }
   });
 });
 
 // start the server
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

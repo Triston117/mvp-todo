@@ -11,7 +11,7 @@
       <h1>To-Do List</h1>
     </header>
     <main>
-      <form>
+      <form id="add-task-form">
         <label for="new-task">Add Task:</label>
         <input
           type="text"
@@ -32,17 +32,7 @@
         <button type="submit">Add</button>
       </form>
       <ul id="task-list">
-        <li class="monday">
-          <input type="checkbox" id="task-1" name="task-1" value="task-1" />
-          <label for="task-1">Example Task 1</label>
-          <button>Delete</button>
-        </li>
-        <li class="tuesday">
-          <input type="checkbox" id="task-2" name="task-2" value="task-2" />
-          <label for="task-2">Example Task 2</label>
-          <button>Delete</button>
-        </li>
-        <!-- more tasks go here -->
+        <!-- Existing tasks will be dynamically added here -->
       </ul>
     </main>
     <footer>
