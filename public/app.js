@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const taskList = document.getElementById("task-list");
   const dayOfWeekSelect = document.getElementById("day-of-week");
+  let selectedDayOfWeek = ""; // New variable to store the selected day of the week
 
   function getTasksForDay(day) {
     fetch(`/tasks/${day}`)
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tasks.forEach((task) => {
           const listItem = document.createElement("li");
           listItem.classList.add(day);
-          listItem.dataset.taskId = task.id; // Set the task ID as a data attribute
+          listItem.dataset.taskId = task.id;
 
           listItem.innerHTML = `
             <input type="checkbox" id="${task.id}" name="task-${
@@ -50,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Send POST request to add the task
     fetch(`/tasks/${dayOfWeek}`, {
-      // Update the fetch request URL
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -75,8 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const taskId = listItem.dataset.taskId; // Retrieve the task ID from the data attribute
 
       // Send DELETE request to remove the task
-      fetch(`/tasks/${dayOfWeek}/${taskId}`, {
-        // Update the fetch request URL
+      fetch(`/tasks/${selectedDayOfWeek}/${taskId}`, {
         method: "DELETE",
       })
         .then((response) => response.json())
@@ -99,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fetch and display tasks for the selected day of the week
   dayOfWeekSelect.addEventListener("change", () => {
-    const selectedDay = dayOfWeekSelect.value;
-    getTasksForDay(selectedDay);
+    selectedDayOfWeek = dayOfWeekSelect.value; // Store the selected day of the week
+    getTasksForDay(selectedDayOfWeek);
   });
 });
