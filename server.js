@@ -6,7 +6,7 @@ import pg from "pg";
 dotenv.config();
 const app = express();
 const PORT = 3000;
-
+//Ahhhh
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
 });
@@ -21,7 +21,6 @@ app.get("/", (req, res) => {
 app.get("/tasks", (req, res) => {
   res.status(400).send("Specify a day.");
 });
-
 // tasks for day
 app.get("/tasks/:day", (req, res) => {
   const day = req.params.day;
