@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const listItem = event.target.parentNode;
       const taskId = listItem.dataset.taskId;
 
-      // Send DELETE request to remove the task
+      // Update the URL by using the selectedDayOfWeek variable
       fetch(`/tasks/${selectedDayOfWeek}/${taskId}`, {
         method: "DELETE",
       })
