@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function deleteTask(event) {
     if (event.target.tagName === "BUTTON") {
       const listItem = event.target.parentNode;
-      const taskId = listItem.dataset.taskId; // Retrieve the task ID from the data attribute
+      const taskId = listItem.dataset.taskId;
 
       // Send DELETE request to remove the task
       fetch(`/tasks/${selectedDayOfWeek}/${taskId}`, {
