@@ -44,7 +44,7 @@ app.get("/tasks/:day", (req, res) => {
   });
 });
 
-// new task finish parse
+// new task
 app.post("/tasks/:day", (req, res) => {
   const { day, task } = req.body;
 
