@@ -13,8 +13,12 @@ const pool = new pg.Pool({
 
 app.use(express.json());
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, "public")));
+
+// Define a route to serve the index.html file
 app.get("/", (req, res) => {
-  res.send("Your engine check light has come on.");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // basic error and route
