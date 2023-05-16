@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const taskInput = document.querySelector("#new-task");
     const dayOfWeek = dayOfWeekSelect.value;
 
+    taskInput.value = "";
+
     const listItem = document.createElement("li");
     listItem.classList.add(dayOfWeek);
     listItem.innerHTML = `
@@ -44,10 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     taskList.appendChild(listItem);
-    taskInput.value = "";
 
     // Send POST request to add the task
-    fetch("/tasks", {
+    fetch(`/tasks/${dayOfWeek}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
