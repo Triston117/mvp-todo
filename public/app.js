@@ -1,38 +1,4 @@
-function addTask(event) {
-  event.preventDefault();
-
-  const newTask = document.createElement("li");
-  const taskInput = document.querySelector("#new-task");
-  const dayOfWeek = document.querySelector("#day-of-week").value;
-
-  newTask.innerHTML = `
-    <input type="checkbox" id="${taskInput.value}" name="${taskInput.value}" value="${taskInput.value}" />
-    <label for="${taskInput.value}">${taskInput.value}</label>
-    <button>Delete</button>
-  `;
-
-  const list = document.querySelector(`#${dayOfWeek}-list`);
-  list.appendChild(newTask);
-  form.reset();
-
-  // Send a POST request to add the task
-  fetch("/tasks", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ day: dayOfWeek, task: taskInput.value }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Error adding task");
-      }
-    })
-    .catch((error) => {
-      console.error(`Error adding task: ${error}`);
-    });
-}
-
+// app.js
 document.addEventListener("DOMContentLoaded", () => {
   const taskList = document.getElementById("task-list");
   const dayOfWeekSelect = document.getElementById("day-of-week");
@@ -61,151 +27,76 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  async function showTasks(day) {
-    try {
-      const response = await fetch(`/tasks/${day}`);
-      const tasks = await response.json();
-
-      taskList.innerHTML = "";
-
-      tasks.forEach((task) => {
-        const listItem = document.createElement("li");
-        listItem.classList.add(day);
-        listItem.innerHTML = `
-          <input type="checkbox" id="${task.id}" name="task-${
-          task.id
-        }" value="${task.task}" ${task.completed ? "checked" : ""} />
-          <label for="${task.id}">${task.task}</label>
-          <button>Delete</button>
-        `;
-        taskList.appendChild(listItem);
-      });
-    } catch (error) {
-      console.log(`Error fetching tasks for ${day}: ${error}`);
-    }
-  }
-
   function addTask(event) {
     event.preventDefault();
 
-    const newTask = document.createElement("li");
     const taskInput = document.querySelector("#new-task");
     const dayOfWeek = dayOfWeekSelect.value;
 
-    newTask.innerHTML = `
-      <input type="checkbox" id="${taskInput.value}" name="${taskInput.value}" value="${taskInput.value}" />
-      <label for="${taskInput.value}">${taskInput.value}</label>
+    const listItem = document.createElement("li");
+    listItem.classList.add(dayOfWeek);
+    listItem.innerHTML = `
+      <input type="checkbox" id="${
+        taskInput.value
+      }" name="task-${Date.now()}" value="${taskInput.value}" />
+      <label for="${Date.now()}">${taskInput.value}</label>
       <button>Delete</button>
     `;
 
-    const list = document.querySelector(`#${dayOfWeek}-list`);
-    list.appendChild(newTask);
-    form.reset();
+    taskList.appendChild(listItem);
+    taskInput.value = "";
 
+    // Send POST request to add the task
     fetch("/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ day: dayOfWeek, task: taskInput.value }),
+      body: JSON.stringify({
+        task: taskInput.value,
+        day: dayOfWeek,
+        completed: false,
+      }),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error adding task");
-        }
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Task added:", data);
       })
       .catch((error) => {
-        console.error(`Error adding task: ${error}`);
+        console.error("Error adding task:", error);
       });
   }
 
-  dayOfWeekSelect.addEventListener("change", (event) => {
-    const selectedDay = event.target.value;
-    showTasks(selectedDay);
+  function deleteTask(event) {
+    if (event.target.tagName === "BUTTON") {
+      const listItem = event.target.parentNode;
+      const taskId = listItem.querySelector("input[type=checkbox]").id;
+
+      // Send DELETE request to remove the task
+      fetch(`/tasks/${taskId}`, {
+        method: "DELETE",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Task deleted:", data);
+          listItem.remove();
+        })
+        .catch((error) => {
+          console.error("Error deleting task:", error);
+        });
+    }
+  }
+
+  // Add event listener for form submission
+  const taskForm = document.getElementById("task-form");
+  taskForm.addEventListener("submit", addTask);
+
+  // Add event listener for delete button clicks
+  taskList.addEventListener("click", deleteTask);
+
+  // Fetch and display tasks for the selected day of the week
+  dayOfWeekSelect.addEventListener("change", () => {
+    const selectedDay = dayOfWeekSelect.value;
+    getTasksForDay(selectedDay);
   });
-
-  const form = document.querySelector("#task-form");
-  form.addEventListener("submit", addTask);
-
-  const defaultSelectedDay = dayOfWeekSelect.value;
-  showTasks(defaultSelectedDay);
 });
-
-// Update task list when day of week is changed
-const dayOfWeekSelect = document.querySelector("#day-of-week");
-dayOfWeekSelect.addEventListener("change", (event) => {
-  const selectedDay = event.target.value;
-  showTasks(selectedDay);
-});
-
-// "Get" button click event handler
-const getTableButton = document.querySelector("#get-table-button");
-getTableButton.addEventListener("click", () => {
-  const selectedDay = dayOfWeekSelect.value;
-  getTable(selectedDay);
-});
-
-// Function to get the table related to the selected day
-function getTable(day) {
-  const table = document.querySelector(`#${day}-table`);
-  if (table) {
-    console.log(`Table for ${day} exists`);
-  } else {
-    console.log(`Table for ${day} does not exist`);
-  }
-}
-
-// Function to add a task to the corresponding day of the week table
-function addTask(event) {
-  event.preventDefault();
-
-  const taskInput = document.querySelector("#new-task");
-  const dayOfWeek = dayOfWeekSelect.value;
-
-  const table = document.querySelector(`#${dayOfWeek}-table`);
-  if (table) {
-    const newRow = document.createElement("tr");
-    const taskCell = document.createElement("td");
-    taskCell.textContent = taskInput.value;
-    newRow.appendChild(taskCell);
-    table.appendChild(newRow);
-  } else {
-    console.log(`Table for ${dayOfWeek} does not exist`);
-  }
-
-  form.reset();
-}
-
-// Add event listener to the form's submit event
-const form = document.querySelector("#task-form");
-form.addEventListener("submit", addTask);
-
-// Function to show tasks for the selected day
-async function showTasks(day) {
-  try {
-    const response = await fetch(`/tasks/${day}`);
-    const tasks = await response.json();
-
-    const taskList = document.getElementById("task-list");
-    taskList.innerHTML = "";
-
-    tasks.forEach((task) => {
-      const listItem = document.createElement("li");
-      listItem.classList.add(day);
-      listItem.innerHTML = `
-        <input type="checkbox" id="${task.id}" name="task-${task.id}" value="${
-        task.task
-      }" ${task.completed ? "checked" : ""} />
-        <label for="${task.id}">${task.task}</label>
-        <button>Delete</button>
-      `;
-      taskList.appendChild(listItem);
-    });
-  } catch (error) {
-    console.error(`Error fetching tasks for ${day}: ${error}`);
-  }
-}
-
-// Initialize with the tasks for the default selected day
-const defaultSelectedDay = dayOfWeekSelect.value;
-showTasks(defaultSelectedDay);
