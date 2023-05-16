@@ -37,18 +37,22 @@ app.get("/tasks/:day", (req, res) => {
 });
 
 // new task finish parse
-app.post("/tasks", (req, res) => {
+app.post("/tasks/:day", (req, res) => {
   const { day, task } = req.body;
 
-  pool.query(`INSERT INTO ${day} (task) VALUES ($1)`, [task], (err, result) => {
-    if (err) {
-      console.log(`Error adding task to ${day} table: ${err}`);
-      res.status(500).send("Error adding task");
-    } else {
-      console.log(`Added task to ${day} table: ${task}`);
-      res.status(201).send("Task added successfully");
+  pool.query(
+    `INSERT INTO ${day} (task, completed) VALUES ($1, false)`,
+    [task],
+    (err, result) => {
+      if (err) {
+        console.log(`Error adding task to ${day} table: ${err}`);
+        res.status(500).send("Error adding task");
+      } else {
+        console.log(`Added task to ${day} table: ${task}`);
+        res.status(201).send("Task added successfully");
+      }
     }
-  });
+  );
 });
 
 // delete a task from the database
@@ -64,6 +68,25 @@ app.delete("/tasks/:day/:id", (req, res) => {
       res.status(200).send("Task deleted successfully");
     }
   });
+});
+
+// changed completed from false to true:
+app.patch("/tasks/:day/:id", (req, res) => {
+  const { day, id } = req.params;
+
+  pool.query(
+    `UPDATE ${day} SET completed = true WHERE id = $1`,
+    [id],
+    (err, result) => {
+      if (err) {
+        console.log(`Error updating task in ${day} table: ${err}`);
+        res.status(500).send("Error updating task");
+      } else {
+        console.log(`Updated task in ${day} table: ${id}`);
+        res.status(200).send("Task updated successfully");
+      }
+    }
+  );
 });
 
 // start the server
