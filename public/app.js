@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const taskList = document.getElementById("task-list");
   const dayOfWeekSelect = document.getElementById("day-of-week");
-  let selectedDayOfWeek = ""; // New variable to store the selected day of the week
+  let selectedDayOfWeek = "";
 
   function getTasksForDay(day) {
     fetch(`/tasks/${day}`)
