@@ -26,14 +26,10 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// basic error and route
-app.get("/tasks", (req, res) => {
-  res.status(400).send("Specify a day.");
-});
 // tasks for day
 app.get("/tasks/:day", (req, res) => {
-  const day = req.params.day;
-  pool.query(`SELECT * FROM ${day}`, (err, result) => {
+  const day = req.params.day.toLowerCase(); // Convert day to lowercase
+  pool.query(`SELECT * FROM "${day}"`, (err, result) => {
     if (err) {
       console.log(`Error getting tasks from ${day} table: ${err}`);
       res.status(500).send("Error getting tasks");
@@ -46,11 +42,11 @@ app.get("/tasks/:day", (req, res) => {
 
 // new task
 app.post("/tasks/:dayOfWeek", (req, res) => {
-  const dayOfWeek = req.params.dayOfWeek;
+  const dayOfWeek = req.params.dayOfWeek.toLowerCase(); // Convert dayOfWeek to lowercase
   const task = req.body.task;
 
   pool.query(
-    `INSERT INTO ${dayOfWeek} (task, completed) VALUES ($1, false)`,
+    `INSERT INTO "${dayOfWeek}" (task, completed) VALUES ($1, false)`,
     [task],
     (err, result) => {
       if (err) {
@@ -67,31 +63,37 @@ app.post("/tasks/:dayOfWeek", (req, res) => {
 // delete a task from the database
 app.delete("/tasks/:day/:id", (req, res) => {
   const { day, id } = req.params;
+  const dayLowerCase = day.toLowerCase(); // Convert day to lowercase
 
-  pool.query(`DELETE FROM ${day} WHERE id = $1`, [id], (err, result) => {
-    if (err) {
-      console.log(`Error deleting task from ${day} table: ${err}`);
-      res.status(500).send("Error deleting task");
-    } else {
-      console.log(`Deleted task from ${day} table: ${id}`);
-      res.status(200).send("Task deleted successfully");
+  pool.query(
+    `DELETE FROM "${dayLowerCase}" WHERE id = $1`,
+    [id],
+    (err, result) => {
+      if (err) {
+        console.log(`Error deleting task from ${dayLowerCase} table: ${err}`);
+        res.status(500).send("Error deleting task");
+      } else {
+        console.log(`Deleted task from ${dayLowerCase} table: ${id}`);
+        res.status(200).send("Task deleted successfully");
+      }
     }
-  });
+  );
 });
 
 // changed completed from false to true:
 app.patch("/tasks/:day/:id", (req, res) => {
   const { day, id } = req.params;
+  const dayLowerCase = day.toLowerCase(); // Convert day to lowercase
 
   pool.query(
-    `UPDATE ${day} SET completed = true WHERE id = $1`,
+    `UPDATE "${dayLowerCase}" SET completed = true WHERE id = $1`,
     [id],
     (err, result) => {
       if (err) {
-        console.log(`Error updating task in ${day} table: ${err}`);
+        console.log(`Error updating task in ${dayLowerCase} table: ${err}`);
         res.status(500).send("Error updating task");
       } else {
-        console.log(`Updated task in ${day} table: ${id}`);
+        console.log(`Updated task in ${dayLowerCase} table: ${id}`);
         res.status(200).send("Task updated successfully");
       }
     }
