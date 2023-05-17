@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  function addTask(event) {
+  function addTask(event, taskList) {
     event.preventDefault();
 
     const taskInput = document.querySelector("#new-task");
@@ -81,6 +81,13 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error adding task:", error);
       });
   }
+
+  // ...
+
+  // Add event listener for form submission
+  const taskForm = document.getElementById("task-form");
+  taskForm.addEventListener("submit", (event) => addTask(event, taskList));
+
   // test change
   function deleteTask(event) {
     if (event.target.tagName === "BUTTON") {
