@@ -1,27 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const taskList = document.getElementById("task-list");
   const dayOfWeekSelect = document.getElementById("day-of-week");
   let selectedDayOfWeek = ""; // New variable to store the selected day of the week
-  const dayTables = {}; // Object to store the day tables
-  const taskList = document.getElementById("task-list"); // Define taskList variable
-
-  function getOrCreateDayTable(day) {
-    if (!dayTables[day]) {
-      const dayTable = document.createElement("ul");
-      dayTable.classList.add("day-table");
-      dayTables[day] = dayTable;
-    }
-    return dayTables[day];
-  }
 
   function getTasksForDay(day) {
     fetch(`/tasks/${day}`)
       .then((response) => response.json())
       .then((tasks) => {
-        const dayTable = getOrCreateDayTable(day);
-        dayTable.innerHTML = "";
+        taskList.innerHTML = "";
 
         tasks.forEach((task) => {
           const listItem = document.createElement("li");
+          listItem.classList.add(day);
           listItem.dataset.taskId = task.id;
 
           listItem.innerHTML = `
@@ -32,11 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <button>Delete</button>
           `;
 
-          dayTable.appendChild(listItem);
+          taskList.appendChild(listItem);
         });
-
-        taskList.innerHTML = "";
-        taskList.appendChild(dayTable);
       })
       .catch((error) => {
         console.error(`Error getting tasks for ${day}: ${error}`);
@@ -48,19 +35,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const taskInput = document.querySelector("#new-task");
     const dayOfWeek = dayOfWeekSelect.value;
-    taskInput.value = ""; // Clear the input value
 
     const listItem = document.createElement("li");
-    listItem.dataset.taskId = Date.now();
-
+    listItem.classList.add(dayOfWeek);
     listItem.innerHTML = `
-      <input type="checkbox" id="${listItem.dataset.taskId}" name="task-${listItem.dataset.taskId}" value="${taskInput.value}" />
-      <label for="${listItem.dataset.taskId}">${taskInput.value}</label>
+      <input type="checkbox" id="${
+        taskInput.value
+      }" name="task-${Date.now()}" value="${taskInput.value}" />
+      <label for="${Date.now()}">${taskInput.value}</label>
       <button>Delete</button>
     `;
 
-    const dayTable = getOrCreateDayTable(dayOfWeek);
-    dayTable.appendChild(listItem);
+    taskList.appendChild(listItem);
+    taskInput.value = "";
 
     // Send POST request to add the task
     fetch(`/tasks/${dayOfWeek}`, {
@@ -81,13 +68,13 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error adding task:", error);
       });
   }
-  // test change
+
   function deleteTask(event) {
     if (event.target.tagName === "BUTTON") {
       const listItem = event.target.parentNode;
       const taskId = listItem.dataset.taskId;
 
-      // Update the URL by using the selectedDayOfWeek variable
+      // Send DELETE request to remove the task
       fetch(`/tasks/${selectedDayOfWeek}/${taskId}`, {
         method: "DELETE",
       })
