@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error adding task:", error);
       });
   }
-
+  // test change
   function deleteTask(event) {
     if (event.target.tagName === "BUTTON") {
       const listItem = event.target.parentNode;
