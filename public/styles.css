@@ -1,11 +1,13 @@
-/* set default styles */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* style the header */
+body {
+  font-family: "Bebas Neue", sans-serif;
+}
+
 header {
   background-color: #333;
   color: #fff;
@@ -13,7 +15,6 @@ header {
   text-align: center;
 }
 
-/* style the main content */
 main {
   display: flex;
   flex-direction: column;
@@ -48,7 +49,6 @@ button[type="submit"] {
   cursor: pointer;
 }
 
-/* style the task list */
 ul {
   list-style: none;
 }
