@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const taskInput = document.querySelector("#new-task");
     const dayOfWeek = dayOfWeekSelect.value;
+    taskInput.value = ""; // Clear the input value
 
     const listItem = document.createElement("li");
     listItem.dataset.taskId = Date.now();
@@ -60,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dayTable = getOrCreateDayTable(dayOfWeek);
     dayTable.appendChild(listItem);
-    taskInput.value = "";
 
     // Send POST request to add the task
     fetch(`/tasks/${dayOfWeek}`, {
