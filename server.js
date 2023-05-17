@@ -45,18 +45,19 @@ app.get("/tasks/:day", (req, res) => {
 });
 
 // new task
-app.post("/tasks/:day", (req, res) => {
-  const { day, task } = req.body;
+app.post("/tasks/:dayOfWeek", (req, res) => {
+  const dayOfWeek = req.params.dayOfWeek;
+  const task = req.body.task;
 
   pool.query(
-    `INSERT INTO ${day} (task, completed) VALUES ($1, false)`,
+    `INSERT INTO ${dayOfWeek} (task, completed) VALUES ($1, false)`,
     [task],
     (err, result) => {
       if (err) {
-        console.log(`Error adding task to ${day} table: ${err}`);
+        console.log(`Error adding task to ${dayOfWeek} table: ${err}`);
         res.status(500).send("Error adding task");
       } else {
-        console.log(`Added task to ${day} table: ${task}`);
+        console.log(`Added task to ${dayOfWeek} table: ${task}`);
         res.status(201).send("Task added successfully");
       }
     }

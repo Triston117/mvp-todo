@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dayOfWeekSelect = document.getElementById("day-of-week");
   let selectedDayOfWeek = ""; // New variable to store the selected day of the week
   const dayTables = {}; // Object to store the day tables
+  const taskList = document.getElementById("task-list"); // Define taskList variable
 
   function getOrCreateDayTable(day) {
     if (!dayTables[day]) {
@@ -34,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
           dayTable.appendChild(listItem);
         });
 
-        const taskList = document.getElementById("task-list");
         taskList.innerHTML = "";
         taskList.appendChild(dayTable);
       })
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  function addTask(event, taskList) {
+  function addTask(event) {
     event.preventDefault();
 
     const taskInput = document.querySelector("#new-task");
@@ -81,13 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error adding task:", error);
       });
   }
-
-  // ...
-
-  // Add event listener for form submission
-  const taskForm = document.getElementById("task-form");
-  taskForm.addEventListener("submit", (event) => addTask(event, taskList));
-
   // test change
   function deleteTask(event) {
     if (event.target.tagName === "BUTTON") {
